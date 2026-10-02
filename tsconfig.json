@@ -1,11 +1,16 @@
 {
+  "files": [],
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }],
   "compilerOptions": {
-    "lib": ["es2023"],
-    "module": "node20",
-    "target": "es2023",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "noImplicitAny": false,
+    "noUnusedParameters": false,
     "skipLibCheck": true,
-    "outDir": "dist",
-    "types": ["node", "mocha"],
-    "verbatimModuleSyntax": true
+    "allowJs": true,
+    "noUnusedLocals": false,
+    "strictNullChecks": false
   }
 }
