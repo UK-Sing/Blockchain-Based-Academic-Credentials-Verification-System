@@ -29,3 +29,19 @@
 
 # Snapshot cheatcodes output
 /snapshots
+
+# Generated contract artifacts consumed by the app
+backend/src/blockchain/generated/CredentialRegistry.json
+frontend/src/contracts/CredentialRegistry.json
+
+# Nested workspace dependencies and build output
+**/node_modules
+**/dist
+
+# Local Hardhat ignition deployments
+ignition/deployments/chain-31337
+
+# Blockchain explorer exports (public data, not project code)
+export-*.csv
+# TypeScript incremental build info
+**/tsconfig.tsbuildinfo

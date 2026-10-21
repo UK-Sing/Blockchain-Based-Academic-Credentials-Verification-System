@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+}
+
+enum CredentialStatus {
+  VALID
+  REVOKED
+}
+
+enum InstitutionStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  REJECTED
+}
+
+enum TrustLevel {
+  UNVERIFIED
+  VERIFIED
+  ACCREDITED
+}
+
+/// Platform maintainers. Observe the system and moderate institutions; never issue or revoke credentials.
+model Admin {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(ADMIN)
+  createdAt    DateTime @default(now())
+
+  @@map("admins")
+}
+
+/// Credential issuers (universities, colleges). Only ACTIVE institutions can issue or revoke.
+model Institution {
+  id                 String            @id @default(uuid())
+  name               String            @unique
+  email              String            @unique
+  passwordHash       String
+  contactName        String
+  phone              String?
+  website            String?
+  registrationNumber String?           // e.g. AISHE / UGC code
+  address            String?
+
+  status             InstitutionStatus @default(PENDING)
+  statusReason       String?
+  reviewedAt         DateTime?
+  trustLevel         TrustLevel        @default(UNVERIFIED)
+
+  credentials        Credential[]
+  students           Student[]
+
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  @@index([status])
+  @@map("institutions")
+}
+
+model Student {
+  id            String       @id @default(uuid())
+  studentId     String       @unique // platform-wide academic ID; matches Credential.studentId
+  name          String
+  email         String       @unique
+  phone         String?
+  department    String
+  batchYear     Int
+  passwordHash  String
+  institutionId String?
+  institution   Institution? @relation(fields: [institutionId], references: [id])
+  createdAt     DateTime     @default(now())
+
+  @@index([institutionId])
+  @@map("students")
+}
+
+model Credential {
+  id                      String            @id @default(uuid())
+  credentialId            String            @unique // e.g. CRED-2026-000001
+
+  // Off-chain data (PostgreSQL only)
+  studentName             String
+  studentId               String
+  universityName          String
+  degree                  String
+  course                  String
+  department              String
+  graduationYear          Int
+  issueDate               DateTime
+  grade                   String
+
+  // Hash + on-chain linkage
+  credentialHash          String            // 0x-prefixed keccak256 hash
+  blockchainTxHash        String?
+  blockchainCredentialId  String?           // usually same as credentialId
+  blockNumber             Int?
+  contractAddress         String?
+  network                 String?
+
+  status                  CredentialStatus  @default(VALID)
+
+  institutionId           String?
+  institution             Institution?      @relation(fields: [institutionId], references: [id])
+
+  revocation              Revocation?
+
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
+
+  @@index([status])
+  @@index([studentId])
+  @@index([institutionId])
+  @@map("credentials")
+}
+
+model Revocation {
+  id                String     @id @default(uuid())
+  credentialId      String     @unique
+  credential        Credential @relation(fields: [credentialId], references: [credentialId])
+
+  reason            String
+
+  blockchainTxHash  String?
+  blockNumber       Int?
+
+  revokedAt         DateTime   @default(now())
+
+  @@map("revocations")
+}

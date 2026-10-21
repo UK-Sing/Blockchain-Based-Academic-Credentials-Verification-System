@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: credential-chain-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: credential_user
+      POSTGRES_PASSWORD: credential_pass
+      POSTGRES_DB: credential_chain
+    ports:
+      - "5432:5432"
+    volumes:
+      - credential_chain_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U credential_user -d credential_chain"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: credential-chain-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@demo-university.edu
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    profiles: ["tools"]
+
+volumes:
+  credential_chain_pgdata:

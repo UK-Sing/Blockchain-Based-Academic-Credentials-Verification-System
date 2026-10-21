@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  }
+  h1, h2, h3 {
+    font-family: 'Source Serif 4', Georgia, serif;
+  }
+  :focus-visible {
+    outline: 2px solid #0F5C52;
+    outline-offset: 2px;
+  }
+}
+
+/* Solid colours only: disabled states use solid greys instead of opacity, focus uses outlines instead of rings (box-shadow). */
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm border border-ink bg-ink px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:border-ink-light hover:bg-ink-light disabled:cursor-not-allowed disabled:border-ink-placeholder disabled:bg-ink-placeholder disabled:text-white;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm border border-ink-line bg-white px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:border-ink-muted hover:bg-ink-faint disabled:cursor-not-allowed disabled:border-ink-line disabled:bg-ink-soft disabled:text-ink-placeholder;
+  }
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm border border-danger bg-danger px-4 py-2.5 text-sm font-medium text-white transition-colors hover:border-danger-dark hover:bg-danger-dark disabled:cursor-not-allowed disabled:border-danger-line disabled:bg-danger-line;
+  }
+  .field-label {
+    @apply mb-1.5 block text-sm font-medium text-ink-light;
+  }
+  .field-input {
+    @apply w-full rounded-sm border border-ink-line bg-white px-3 py-2 text-sm text-ink placeholder:text-ink-placeholder focus:border-seal focus:outline focus:outline-1 focus:outline-seal disabled:bg-ink-soft disabled:text-ink-muted;
+  }
+  .card {
+    @apply rounded-sm border border-rule bg-white;
+  }
+}
